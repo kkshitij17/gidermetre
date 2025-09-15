@@ -142,6 +142,46 @@ createApp({
     },
     
     methods: {
+        // Format plain numeric amount into input-friendly string with thousand separators (e.g., 123.456.789)
+        formatInput(amount) {
+            const numericAmount = Number(amount || 0);
+            const sign = numericAmount < 0 ? '-' : '';
+            const abs = Math.floor(Math.abs(numericAmount));
+            const formatted = abs.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            return sign + formatted;
+        },
+
+        // Parse any input string into a non-decimal integer amount by stripping non-digits
+        parseAmountFromInput(inputValue) {
+            const digits = (inputValue || '').toString().replace(/\D/g, '');
+            return Number(digits || 0);
+        },
+
+        // Unified input handler for all amount inputs (daily/monthly/yearly + custom)
+        onAmountInput(category, rawValue) {
+            const parsed = this.parseAmountFromInput(rawValue);
+            // Update local object
+            category.amount = parsed;
+
+            // Persist to correct bucket using existing helpers
+            const isDaily = !!this.predefinedDaily.find(c => c.id === category.id) || !!this.customDaily.find(c => c.id === category.id);
+            const isMonthly = !!this.predefinedMonthly.find(c => c.id === category.id) || !!this.customMonthly.find(c => c.id === category.id);
+            const isYearly = (!!this.predefinedYearly && !!this.predefinedYearly.find(c => c.id === category.id)) || (!!this.customYearly && !!this.customYearly.find(c => c.id === category.id));
+
+            if (isDaily || isMonthly || isYearly) {
+                // Try predefined first
+                if (this.predefinedDaily.find(c => c.id === category.id) || this.predefinedMonthly.find(c => c.id === category.id) || (this.predefinedYearly && this.predefinedYearly.find(c => c.id === category.id))) {
+                    this.updateExpense(category.id, parsed);
+                } else {
+                    // Custom categories
+                    this.updateCustomCategory(category.id, category.name, parsed);
+                }
+            }
+
+            this.calculateLiveExpense();
+            this.saveData();
+        },
+
         // Format currency to Turkish Lira with kuruş
         formatCurrency(amount) {
             return new Intl.NumberFormat('tr-TR', {
