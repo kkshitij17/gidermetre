@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gidermetre - Masraf Takip Uygulaması</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#64748b',
+                        accent: '#f59e0b',
+                        success: '#10b981',
+                        danger: '#ef4444',
+                        warning: '#f59e0b',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'pulse-slow': 'pulse 3s infinite',
+                        'counter': 'counter 0.8s ease-out',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        
+        @keyframes counter {
+            from { transform: scale(1.1); }
+            to { transform: scale(1); }
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .meter-fill {
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .expense-input {
+            cursor: crosshair;
+        }
+        
+        /* Hide number input arrows */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        
+        /* Light placeholder color */
+        .expense-input::placeholder {
+            color: #d1d5db !important;
+            opacity: 1;
+        }
+        
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <div id="app" class="flex flex-col min-h-screen">
+        <!-- Fixed Header -->
+        <div class="fixed top-0 left-0 right-0 z-50">
+            <!-- Header -->
+            <header class="gradient-bg text-white shadow-2xl py-4">
+                <div class="container mx-auto px-4">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+                        <!-- Branding -->
+                        <div class="flex flex-col items-center lg:items-start">
+                            <h1 class="text-3xl font-bold">💰 Gidermetre</h1>
+                            <p class="text-blue-100 text-sm mt-1">Sürekli giderlerinizi görün</p>
+                        </div>
+                        
+                        <!-- Expense Summary -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                            <div class="bg-white bg-opacity-20 rounded-lg p-2">
+                                <div class="text-xs text-blue-100">Saatlik</div>
+                                <div class="text-sm font-bold">{{ formatCurrency(hourlyExpense) }}</div>
+                            </div>
+                            <div class="bg-white bg-opacity-20 rounded-lg p-2">
+                                <div class="text-xs text-blue-100">Günlük</div>
+                                <div class="text-sm font-bold">{{ formatCurrency(dailyExpenseTotal) }}</div>
+                            </div>
+                            <div class="bg-white bg-opacity-20 rounded-lg p-2">
+                                <div class="text-xs text-blue-100">Haftalık</div>
+                                <div class="text-sm font-bold">{{ formatCurrency(weeklyExpense) }}</div>
+                            </div>
+                            <div class="bg-white bg-opacity-20 rounded-lg p-2">
+                                <div class="text-xs text-blue-100">Aylık</div>
+                                <div class="text-sm font-bold">{{ formatCurrency(totalMonthlyExpense) }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Live Counter -->
+            <div class="bg-gradient-to-r from-red-500 to-red-600 text-white py-4 shadow-lg">
+                <div class="container mx-auto px-4 text-center">
+                    <p class="text-xs text-red-100 mb-1">{{ sessionTime }}</p>
+                    <div class="text-3xl font-bold" :key="liveCounterKey">
+                        {{ formatCurrency(liveExpense) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Spacer for fixed header (header + live counter) -->
+        <div class="h-56 sm:h-60 md:h-52 lg:h-48"></div>
+
+        <div class="container mx-auto px-0 lg:px-4 py-12 lg:py-8 flex-grow">
+
+            <!-- Expense Categories -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                
+                <!-- Günlük Masraflar -->
+                <div class="mb-8">
+                    <h4 class="text-lg font-semibold text-blue-600 mb-4 flex items-center">
+                        <span class="mr-2">📅</span> Günlük Masraflar
+                    </h4>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
+                        <!-- Predefined Daily Categories -->
+                        <div v-for="category in predefinedDaily" :key="category.id" 
+                             class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center relative">
+                            <button @click="removeExpense(category.id)" 
+                                    v-if="category.amount > 0"
+                                    class="absolute top-2 right-2 text-red-500 hover:text-red-700 text-xs">
+                                ✕
+                            </button>
+                            <div class="text-3xl mb-2">{{ category.icon }}</div>
+                            <div class="text-sm font-medium text-gray-700 mb-3">{{ category.name }}</div>
+                            <div class="relative">
+                                <input 
+                                    type="number" 
+                                    v-model.number="category.amount"
+                                    @input="updateExpense(category.id, category.amount)"
+                                    @focus="$event.target.select()"
+                                    placeholder="0"
+                                    class="w-full text-center border-2 border-gray-300 rounded-lg px-3 py-2 text-base font-medium focus:outline-none focus:border-blue-500 caret-transparent pr-8 expense-input"
+                                >
+                                <span class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">₺</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Custom Daily Categories -->
+                        <div v-for="category in customDaily" :key="category.id" 
+                             class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-4 text-center relative">
+                            <button @click="removeCustomCategory(category.id)" 
+                                    class="absolute top-2 right-2 text-red-500 hover:text-red-700 text-xs">
+                                ✕
+                            </button>
+                            <div class="text-3xl mb-2">➕</div>
+                            <div class="text-sm font-medium text-gray-700 mb-3 h-5">
+                                <input 
+                                    type="text" 
+                                    v-model="category.name"
+                                    @blur="updateCustomCategory(category.id, category.name, category.amount)"
+                                    placeholder="İsim..."
+                                    class="w-full text-center bg-transparent border-none focus:outline-none text-sm font-medium text-gray-700"
+                                >
+                            </div>
+                            <div class="relative">
+                                <input 
+                                    type="number" 
+                                    v-model.number="category.amount"
+                                    @input="updateCustomCategory(category.id, category.name, category.amount)"
+                                    @focus="$event.target.select()"
+                                    placeholder="0"
+                                    class="w-full text-center border-2 border-gray-300 rounded-lg px-3 py-2 text-base font-medium focus:outline-none focus:border-blue-500 caret-transparent pr-8 expense-input"
+                                >
+                                <span class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">₺</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Add Custom Daily Button -->
+                        <div class="bg-gray-100 border-2 border-dashed border-gray-400 rounded-lg p-4 text-center hover:bg-gray-200 hover:border-blue-400 cursor-pointer transition-colors"
+                             @click="addCustomDaily">
+                            <div class="text-3xl mb-2 text-gray-400">➕</div>
+                            <div class="text-sm font-medium text-gray-600 mb-3">Yeni Masraf Kalemi</div>
+                            <div class="text-xs text-gray-500">Günlük masraf ekle</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aylık Masraflar -->
+                <div class="mb-8">
+                    <h4 class="text-lg font-semibold text-green-600 mb-4 flex items-center">
+                        <span class="mr-2">🗓️</span> Aylık Masraflar
+                    </h4>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
+                        <!-- Predefined Monthly Categories -->
+                        <div v-for="category in predefinedMonthly" :key="category.id" 
+                             class="bg-green-50 border border-green-200 rounded-lg p-4 text-center relative">
+                            <button @click="removeExpense(category.id)" 
+                                    v-if="category.amount > 0"
+                                    class="absolute top-2 right-2 text-red-500 hover:text-red-700 text-xs">
+                                ✕
+                            </button>
+                            <div class="text-3xl mb-2">{{ category.icon }}</div>
+                            <div class="text-sm font-medium text-gray-700 mb-3">{{ category.name }}</div>
+                            <div class="relative">
+                                <input 
+                                    type="number" 
+                                    v-model.number="category.amount"
+                                    @input="updateExpense(category.id, category.amount)"
+                                    @focus="$event.target.select()"
+                                    placeholder="0"
+                                    class="w-full text-center border-2 border-gray-300 rounded-lg px-3 py-2 text-base font-medium focus:outline-none focus:border-green-500 caret-transparent pr-8 expense-input"
+                                >
+                                <span class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">₺</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Custom Monthly Categories -->
+                        <div v-for="category in customMonthly" :key="category.id" 
+                             class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-4 text-center relative">
+                            <button @click="removeCustomCategory(category.id)" 
+                                    class="absolute top-2 right-2 text-red-500 hover:text-red-700 text-xs">
+                                ✕
+                            </button>
+                            <div class="text-3xl mb-2">➕</div>
+                            <div class="text-sm font-medium text-gray-700 mb-3 h-5">
+                                <input 
+                                    type="text" 
+                                    v-model="category.name"
+                                    @blur="updateCustomCategory(category.id, category.name, category.amount)"
+                                    placeholder="İsim..."
+                                    class="w-full text-center bg-transparent border-none focus:outline-none text-sm font-medium text-gray-700"
+                                >
+                            </div>
+                            <div class="relative">
+                                <input 
+                                    type="number" 
+                                    v-model.number="category.amount"
+                                    @input="updateCustomCategory(category.id, category.name, category.amount)"
+                                    @focus="$event.target.select()"
+                                    class="w-full text-center border-2 border-gray-300 rounded-lg px-3 py-2 text-base font-medium focus:outline-none focus:border-green-500 caret-transparent pr-8 expense-input"
+                                >
+                                <span class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">₺</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Add Custom Monthly Button -->
+                        <div class="bg-gray-100 border-2 border-dashed border-gray-400 rounded-lg p-4 text-center hover:bg-gray-200 hover:border-green-400 cursor-pointer transition-colors"
+                             @click="addCustomMonthly">
+                            <div class="text-3xl mb-2 text-gray-400">➕</div>
+                            <div class="text-sm font-medium text-gray-600 mb-3">Yeni Masraf Kalemi</div>
+                            <div class="text-xs text-gray-500">Aylık masraf ekle</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Yıllık Masraflar -->
+                <div class="mb-8">
+                    <h4 class="text-lg font-semibold text-purple-600 mb-4 flex items-center">
+                        <span class="mr-2">📅</span> Yıllık Masraflar
+                    </h4>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
+                        <!-- Predefined Yearly Categories -->
+                        <div v-for="category in predefinedYearly" :key="category.id" 
+                             class="bg-purple-50 border border-purple-200 rounded-lg p-4 text-center relative">
+                            <button @click="removeExpense(category.id)" 
+                                    v-if="category.amount > 0"
+                                    class="absolute top-2 right-2 text-red-500 hover:text-red-700 text-xs">
+                                ✕
+                            </button>
+                            <div class="text-3xl mb-2">{{ category.icon }}</div>
+                            <div class="text-sm font-medium text-gray-700 mb-3">{{ category.name }}</div>
+                            <div class="relative">
+                                <input 
+                                    type="number" 
+                                    v-model.number="category.amount"
+                                    @input="updateExpense(category.id, category.amount)"
+                                    @focus="$event.target.select()"
+                                    placeholder="0"
+                                    class="w-full text-center border-2 border-gray-300 rounded-lg px-3 py-2 text-base font-medium focus:outline-none focus:border-purple-500 caret-transparent pr-8 expense-input"
+                                >
+                                <span class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">₺</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Custom Yearly Categories -->
+                        <div v-for="category in customYearly" :key="category.id" 
+                             class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-4 text-center relative">
+                            <button @click="removeCustomCategory(category.id)" 
+                                    class="absolute top-2 right-2 text-red-500 hover:text-red-700 text-xs">
+                                ✕
+                            </button>
+                            <div class="text-3xl mb-2">➕</div>
+                            <div class="text-sm font-medium text-gray-700 mb-3 h-5">
+                                <input 
+                                    type="text" 
+                                    v-model="category.name"
+                                    @blur="updateCustomCategory(category.id, category.name, category.amount)"
+                                    placeholder="İsim..."
+                                    class="w-full text-center bg-transparent border-none focus:outline-none text-sm font-medium text-gray-700"
+                                >
+                            </div>
+                            <div class="relative">
+                                <input 
+                                    type="number" 
+                                    v-model.number="category.amount"
+                                    @input="updateCustomCategory(category.id, category.name, category.amount)"
+                                    @focus="$event.target.select()"
+                                    placeholder="0"
+                                    class="w-full text-center border-2 border-gray-300 rounded-lg px-3 py-2 text-base font-medium focus:outline-none focus:border-purple-500 caret-transparent pr-8 expense-input"
+                                >
+                                <span class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">₺</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Add Custom Yearly Button -->
+                        <div class="bg-gray-100 border-2 border-dashed border-gray-400 rounded-lg p-4 text-center hover:bg-gray-200 hover:border-purple-400 cursor-pointer transition-colors"
+                             @click="addCustomYearly">
+                            <div class="text-3xl mb-2 text-gray-400">➕</div>
+                            <div class="text-sm font-medium text-gray-600 mb-3">Yeni Masraf Kalemi</div>
+                            <div class="text-xs text-gray-500">Yıllık masraf ekle</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <footer class="bg-gray-800 text-white py-6 mt-auto">
+            <div class="container mx-auto px-4">
+                <!-- Two Column Layout -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 text-center md:text-left">
+                    <!-- Privacy & Security -->
+                    <div>
+                        <p class="text-green-400 text-sm font-medium mb-2">🔒 Gizlilik & Güvenlik</p>
+                        <p class="text-gray-300 text-xs mb-1">Bu uygulama hiçbir veriyi sunucularımızda depolamaz.</p>
+                        <p class="text-gray-300 text-xs mb-3">Tüm verileriniz sadece tarayıcınızda güvenle saklanır.</p>
+                        
+                        <!-- Clear Data Button -->
+                        <button @click="clearAllData" 
+                                class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-medium">
+                            🗑️ Tüm Verileri Temizle
+                        </button>
+                    </div>
+                    
+                    <!-- Open Source -->
+                    <div>
+                        <p class="text-blue-400 text-sm font-medium mb-2">🌟 Açık Kaynak</p>
+                        <p class="text-gray-300 text-xs mb-2">Bu proje tamamen açık kaynak kodludur.</p>
+                        <a href="https://github.com/iltekin/masrafmetre" target="_blank" rel="noopener noreferrer" 
+                           class="text-blue-400 hover:text-blue-300 underline text-sm">
+                            📁 GitHub'da Görüntüle
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Developer Info -->
+                <div class="border-t border-gray-700 pt-4 text-center">
+                    <p class="text-gray-300 text-sm mb-2">© 2024 Gidermetre - Sürekli giderlerinizi görün</p>
+                    <p class="text-gray-400 text-xs">
+                        Geliştirici: 
+                        <a href="https://x.com/sezeriltekin" target="_blank" rel="noopener noreferrer" 
+                           class="text-blue-400 hover:text-blue-300 underline">
+                            @sezeriltekin
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
