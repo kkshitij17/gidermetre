@@ -44,7 +44,7 @@ createApp({
                 { id: 'arac_kasko', name: 'Araç Kaskosu', icon: '🛡️', amount: 0, frequency: 'yearly' },
                 { id: 'arac_muayene', name: 'Araç Muayenesi', icon: '🔍', amount: 0, frequency: 'yearly' },
                 { id: 'dask', name: 'DASK', icon: '🏠', amount: 0, frequency: 'yearly' },
-                { id: 'saglik_sigorta', name: 'Sağlık Sigortası', icon: '❤️', amount: 0, frequency: 'yearly' },
+                { id: 'saglik_sigorta', name: 'Sağlık Sigortası', icon: '🏥', amount: 0, frequency: 'yearly' },
                 { id: 'emlak_vergi', name: 'Emlak Vergisi', icon: '🏛️', amount: 0, frequency: 'yearly' },
                 { id: 'tatil', name: 'Tatil Masrafı', icon: '🏖️', amount: 0, frequency: 'yearly' },
                 { id: 'gym_yearly', name: 'Spor Salonu (Yıllık)', icon: '🏋️', amount: 0, frequency: 'yearly' }
