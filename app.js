@@ -10,6 +10,7 @@ createApp({
             intervalId: null,
             liveExpenseIntervalId: null,
             
+            
             // Predefined categories
             predefinedDaily: [
                 { id: 'yemek', name: 'Yemek', icon: '🍽️', amount: 0, frequency: 'daily' },

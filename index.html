@@ -116,56 +116,53 @@
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
     <div id="app" class="flex flex-col min-h-screen">
-        <!-- Fixed Header -->
-        <div class="fixed top-0 left-0 right-0 z-50">
-            <!-- Header -->
-            <header class="gradient-bg text-white shadow-2xl py-4">
-                <div class="container mx-auto px-4">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
-                        <!-- Branding -->
-                        <div class="flex flex-col items-center lg:items-start">
-                            <h1 class="text-3xl font-bold">💰 Gidermetre</h1>
-                            <p class="text-blue-100 text-sm mt-1">Sürekli giderlerinizi görün</p>
+        <!-- Header -->
+        <header class="gradient-bg text-white shadow-2xl py-4 md:fixed md:top-0 md:left-0 md:right-0 z-50">
+            <div class="container mx-auto px-4">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+                    <!-- Branding -->
+                    <div class="flex flex-col items-center lg:items-start">
+                        <h1 class="text-3xl font-bold">💰 Gidermetre</h1>
+                        <p class="text-blue-100 text-sm mt-1">Sürekli giderlerinizi görün</p>
+                    </div>
+                    
+                    <!-- Expense Summary -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                        <div class="bg-white bg-opacity-20 rounded-lg p-2">
+                            <div class="text-xs text-blue-100">Saatlik</div>
+                            <div class="text-sm font-bold">{{ formatCurrency(hourlyExpense) }}</div>
                         </div>
-                        
-                        <!-- Expense Summary -->
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-                            <div class="bg-white bg-opacity-20 rounded-lg p-2">
-                                <div class="text-xs text-blue-100">Saatlik</div>
-                                <div class="text-sm font-bold">{{ formatCurrency(hourlyExpense) }}</div>
-                            </div>
-                            <div class="bg-white bg-opacity-20 rounded-lg p-2">
-                                <div class="text-xs text-blue-100">Günlük</div>
-                                <div class="text-sm font-bold">{{ formatCurrency(dailyExpenseTotal) }}</div>
-                            </div>
-                            <div class="bg-white bg-opacity-20 rounded-lg p-2">
-                                <div class="text-xs text-blue-100">Haftalık</div>
-                                <div class="text-sm font-bold">{{ formatCurrency(weeklyExpense) }}</div>
-                            </div>
-                            <div class="bg-white bg-opacity-20 rounded-lg p-2">
-                                <div class="text-xs text-blue-100">Aylık</div>
-                                <div class="text-sm font-bold">{{ formatCurrency(totalMonthlyExpense) }}</div>
-                            </div>
+                        <div class="bg-white bg-opacity-20 rounded-lg p-2">
+                            <div class="text-xs text-blue-100">Günlük</div>
+                            <div class="text-sm font-bold">{{ formatCurrency(dailyExpenseTotal) }}</div>
+                        </div>
+                        <div class="bg-white bg-opacity-20 rounded-lg p-2">
+                            <div class="text-xs text-blue-100">Haftalık</div>
+                            <div class="text-sm font-bold">{{ formatCurrency(weeklyExpense) }}</div>
+                        </div>
+                        <div class="bg-white bg-opacity-20 rounded-lg p-2">
+                            <div class="text-xs text-blue-100">Aylık</div>
+                            <div class="text-sm font-bold">{{ formatCurrency(totalMonthlyExpense) }}</div>
                         </div>
                     </div>
                 </div>
-            </header>
+            </div>
+        </header>
 
-            <!-- Live Counter -->
-            <div class="bg-gradient-to-r from-red-500 to-red-600 text-white py-4 shadow-lg">
-                <div class="container mx-auto px-4 text-center">
-                    <p class="text-xs text-red-100 mb-1">{{ sessionTime }}</p>
-                    <div class="text-3xl font-bold" :key="liveCounterKey">
-                        {{ formatCurrency(liveExpense) }}
-                    </div>
+        <!-- Live Counter -->
+        <div class="bg-gradient-to-r from-red-500 to-red-600 text-white py-4 pt-4 shadow-lg sticky top-0 md:fixed md:top-[5.7rem] md:left-0 md:right-0 z-40">
+            <div class="container mx-auto px-4 text-center">
+                <p class="text-xs text-red-100 mb-1">{{ sessionTime }}</p>
+                <div class="text-3xl font-bold" :key="liveCounterKey">
+                    {{ formatCurrency(liveExpense) }}
                 </div>
             </div>
         </div>
 
-        <!-- Spacer for fixed header (header + live counter) -->
-        <div class="h-56 sm:h-60 md:h-52 lg:h-48"></div>
+        <!-- Spacer for desktop fixed header -->
+        <div class="hidden md:block h-[5.7rem]"></div>
 
-        <div class="container mx-auto px-0 lg:px-4 py-12 lg:py-8 flex-grow">
+        <div class="container mx-auto px-0 lg:px-4 py-4 md:pt-24 md:pb-12 flex-grow">
 
             <!-- Expense Categories -->
             <div class="bg-white rounded-xl shadow-lg p-6">
