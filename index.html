@@ -28,64 +28,8 @@
             }
         }
     </script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
-        * {
-            font-family: 'Inter', sans-serif;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-        
-        @keyframes counter {
-            from { transform: scale(1.1); }
-            to { transform: scale(1); }
-        }
-        
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        
-        .glass-effect {
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .meter-fill {
-            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .expense-input {
-            cursor: crosshair;
-        }
-        
-        /* Hide number input arrows */
-        input[type="number"]::-webkit-outer-spin-button,
-        input[type="number"]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        
-        input[type="number"] {
-            -moz-appearance: textfield;
-        }
-        
-        /* Light placeholder color */
-        .expense-input::placeholder {
-            color: #d1d5db !important;
-            opacity: 1;
-        }
-        
-    </style>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="favicon.png">
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
     <div id="app" class="flex flex-col min-h-screen">
