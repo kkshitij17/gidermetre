@@ -100,7 +100,7 @@ liveExpense = (dailyExpensePerSecond + monthlyExpensePerSecond) * sessionSeconds
 
 Bu proje tamamen açık kaynak kodludur. Kodları inceleyebilir, katkıda bulunabilir veya kendi projelerinizde kullanabilirsiniz.
 
-**GitHub**: [https://github.com/iltekin/masrafmetre](https://github.com/iltekin/masrafmetre)
+**GitHub**: [https://github.com/iltekin/gidermetre](https://github.com/iltekin/gidermetre)
 
 ## 👨‍💻 Geliştirici
 
