@@ -112,4 +112,4 @@ Bu proje MIT lisansı altında lisanslanmıştır.
 
 ---
 
-**© 2024 Gidermetre** - Masraflarınızı kontrol altında tutun! 💰
+**© 2025 Gidermetre** - Masraflarınızı kontrol altında tutun! 💰
